@@ -40,6 +40,9 @@ class EsriDumper(object):
             self._logger = parent_logger.getChild("esridump")
         else:
             self._logger = logging.getLogger("esridump")
+            self._logger.addHandler(logging.StreamHandler())    #tmp
+            self._logger.setLevel(logging.DEBUG)                #tmp
+            
 
     def _request(self, method, url, **kwargs):
         try:
@@ -367,6 +370,7 @@ class EsriDumper(object):
         except EsriDownloadError:
             self._logger.info("Source does not support feature count")
 
+        # page_args holds the list of queries to make against the endpoint
         page_args = []
 
         if (
@@ -501,9 +505,14 @@ class EsriDumper(object):
                         saved.add(oid)
 
                     return
+                
+        # Separate here into a _build_page_args function
 
         query_url = self._build_url("/query")
         headers = self._build_headers()
+        
+        
+        
         for query_args in page_args:
             try:
                 response = self._request(
